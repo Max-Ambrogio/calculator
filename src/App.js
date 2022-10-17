@@ -1,20 +1,27 @@
 import React, {useState} from 'react';
 import './App.css';
-import CalculatorDisplay from './components/display'
-import DisplayScreen from './components/display-screen'
+import CalculatorDisplay from './components/CalculatorDisplay'
+import DisplayScreen from './components/DisplayScreen'
 import Button from './components/button'
 
 
+const DEFAULT_STATE = {
+    currentNumber: 1,
+    currentVariable: '', // good approach
+    number1: '',
+    number2: '',
+    operation:'',
+
+    // question: '',
+    answer: '',
+}
+
 class App extends React.Component {
+
+    state = {...DEFAULT_STATE} 
 
     constructor() {
         super();
-
-        this.state = {
-            question: '',
-            answer: '',
-        }
-
 
         this.handleClick = this.handleClick.bind(this);
     }
@@ -24,40 +31,94 @@ class App extends React.Component {
 
         switch(value) {
             case '=': {
-                if(this.state.question!==''){
-                    var ans='';
 
-                    try{
-                        ans = eval(this.state.question);
-                    }
+                var ans='';
+                const {number1, number2, operation} = this.state
 
-                    catch(err){
-                        this.setState({answer: 'Math error'});
-                    }
-
-                    if (ans===undefined){
-                        this.setState({answer: 'Math error'});
-                    }
-
-                    else{
-                        this.setState({answer: ans, question: ''});
-                        break;
+                try{
+                    switch(operation){
+                        case '+':
+                            ans= number1 + number2;
+                            break;
+                        case '-':
+                            ans= number1 - number2;
+                            break;
+                        case '*':
+                            ans= number1 * number2;
+                            break;
+                        case '/':
+                            ans= number1 / number2;
+                            break;
                     }
                 }
+
+                catch(err){
+                    this.setState({answer: 'Math error'});
+                }
+
+                if (ans===undefined){
+                    this.setState({answer: 'Math error'});
+                }
+
+                else{
+                    this.setState({answer: ans, question: ''});
+                    break;
+                }
+            
             }
             case 'C': {
-                this.setState({ question: '', answer: ''});
+                this.setState({...DEFAULT_STATE});
                 break;
             }
             case 'DE': {
-                var str = this.state.question;
-                str = str.substring(0,str.length-1)
-                this.setState({question: str});
+                this.setState((prevState)=> {
+                    const newState = {}
+                    const {currentVariable: cv, number1, number2} = prevState
+                    if(cv === 'number2'){
+                        if(number2.length > 1){
+                            newState.number2 = number2.substring(0, number2.length - 1)
+                        } else {
+                            newState.number2 = ""
+                            newState.currentVariable = 'operation'
+                        }
+                    } else if (cv === 'operation'){
+                        newState.operation = ''
+                        newState.currentVariable = 'number1'
+                    } else {
+                        if (number1.length > 0){
+                            newState.number1 = number1.substring(0, number1.length - 1)
+                        }
+                    }
+                    return newState
+                });
                 break;
             }
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+                this.setState({
+                    operation:value,
+                    currentNumber:2,
+                    currentVariable: 'operation',
+                })
+            break;
 
             default: {
-                this.setState({ question: this.state.question += value})
+                //insteasd of eval , first #, second # ,"="
+                this.setState((prevState) => {
+                    const newState = {
+                        lastTypedValue: value
+                    }
+                    if(prevState.currentNumber == 1){
+                        newState.currentVariable = "number1"
+                        newState.number1 = prevState.number1 + value
+                    } else {
+                        newState.currentVariable = "number2"
+                        newState.number2 = prevState.number2 + value;
+                    }
+                    return newState
+                })
                 break;
             }
         }
@@ -65,12 +126,17 @@ class App extends React.Component {
 
 
 
+
     render(){
+
+        const {number1, number2, operation} = this.state
+        const question = `${number1} ${operation} ${number2}`
         return (
             <div className='body'>
                 <CalculatorDisplay value='Calculator'/>
                 <div className='mainFrame'>
-                    <DisplayScreen className='screen'/>
+                   {/* {...this.state} */}
+                    <DisplayScreen {...this.state} question={question} className='screen'/>
                     <div className='button-row'>
                         <Button handleClick = {this.handleClick} label={'C'}/>
                         <Button handleClick = {this.handleClick} label={'DE'}/>
