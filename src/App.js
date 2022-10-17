@@ -23,7 +23,7 @@ class App extends React.Component {
         const value = event.target.value;
 
         switch(value) {
-            case '=':{
+            case '=': {
                 if(this.state.question!==''){
                     var ans='';
 
@@ -41,15 +41,17 @@ class App extends React.Component {
 
                     else{
                         this.setState({answer: ans, question: ''});
+                        break;
                     }
                 }
             }
-            case 'Clear': {
+            case 'C': {
                 this.setState({ question: '', answer: ''});
                 break;
             }
-            case 'Delete': {
-                const str = this.state.question;
+            case 'DE': {
+                var str = this.state.question;
+                str = str.substring(0,str.length-1)
                 this.setState({question: str});
                 break;
             }
