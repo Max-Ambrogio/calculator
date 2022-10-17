@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
 import CalculatorDisplay from './components/CalculatorDisplay'
 import DisplayScreen from './components/DisplayScreen'
@@ -26,9 +26,22 @@ class App extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
+    componentDidMount = () => {
+        document.addEventListener('keyup', this.handleKeyUp)
+    }
+    componentWillUnmount = () => {
+        document.removeEventListener('keyup', this.handleKeyUp)
+    }
+    handleKeyUp = (event) => {
+        console.log('keyup', event)
+        this.captureValue(event.key)
+    } 
     handleClick(event){
         const value = event.target.value;
+        this.captureValue(value)
+    }
 
+    captureValue = (value) => {
         switch(value) {
             case '=': {
 
@@ -49,6 +62,8 @@ class App extends React.Component {
                         case '/':
                             ans= number1 / number2;
                             break;
+                        default:
+                            //no opp
                     }
                 }
 
@@ -62,8 +77,9 @@ class App extends React.Component {
 
                 else{
                     this.setState({answer: ans, question: ''});
-                    break;
                 }
+
+                break;
             
             }
             case 'C': {
@@ -110,7 +126,7 @@ class App extends React.Component {
                     const newState = {
                         lastTypedValue: value
                     }
-                    if(prevState.currentNumber == 1){
+                    if(prevState.currentNumber ===1){
                         newState.currentVariable = "number1"
                         newState.number1 = prevState.number1 + value
                     } else {
