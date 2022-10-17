@@ -1,0 +1,21 @@
+.body{
+  text-align: center;
+  margin-top: 2%;
+
+}
+
+.mainFrame{
+  background-color: rgb(71, 71, 110);
+  margin: 10px auto;
+  padding: 10px;
+  
+}
+
+input{
+  padding: 10px;
+}
+
+.screen{
+  border: none;
+ 
+}
